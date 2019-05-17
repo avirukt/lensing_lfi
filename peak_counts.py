@@ -10,10 +10,10 @@ nsims_test = tot_nsims - nsims_train
 
 indices = np.arange(tot_nsims)
 random.shuffle(indices)
-x_train = array([small_data[ind] for ind in indices[:nsims_train]])
-p_train = array([params[ind] for ind in indices[:nsims_train]])
-x_test = array([small_data[ind] for ind in indices[nsims_train:]])
-p_test = array([params[ind] for ind in indices[nsims_train:]])
+x_train = array([x[ind] for ind in indices[:nsims_train]])
+p_train = array([p[ind] for ind in indices[:nsims_train]])
+x_test = array([x[ind] for ind in indices[nsims_train:]])
+p_test = array([p[ind] for ind in indices[nsims_train:]])
 
 batch_size = 128
 
