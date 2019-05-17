@@ -8,6 +8,5 @@
 #SBATCH --partition=savio2_gpu
 #SBATCH --qos=savio_normal
 
-module load python
-module load tensorflow
+module load tensorflow/1.12.0-py36-pip-gpu
 srun python peak_counts.py
