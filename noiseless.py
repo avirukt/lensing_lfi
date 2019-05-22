@@ -10,17 +10,19 @@ feature_description = {
     "params": tf.FixedLenFeature([3], tf.float32)
 }
 
+data_path = "/global/scratch/avirukt/jia_sims.tfrecord"
+
 def parse(example_proto):
     # Parse the input tf.Example proto using the dictionary above.
     d = tf.parse_single_example(example_proto, feature_description)
     return (tf.reshape(d["field"],(256,256)),d["params"])
 
 def testing_input_fn(batch_size=batch_size):
-    dataset = tf.data.TFRecordDataset(os.environ["SCRATCH"] + "/jia_sims/jia_sims.tfrecord", buffer_size=2**30)
+    dataset = tf.data.TFRecordDataset(data_path, buffer_size=2**30)
     return dataset.take(nsims_test).map(parse).batch(batch_size)
 
 def training_input_fn(shuffle_buffer=1000, batch_size=batch_size):
-    dataset = tf.data.TFRecordDataset(os.environ["SCRATCH"] + "/jia_sims/jia_sims.tfrecord", buffer_size=2**30)
+    dataset = tf.data.TFRecordDataset(data_path, buffer_size=2**30)
     return dataset.skip(nsims_test).map(parse).repeat().shuffle(shuffle_buffer).batch(batch_size)
 
 
