@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name="$1"
+#SBATCH --job-name='"$1"'
 #SBATCH --account=fc_cosmoml
 #SBATCH --nodes=1
 #SBATCH --cpus-per-task=2
