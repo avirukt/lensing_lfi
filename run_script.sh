@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=peak_counts
+#SBATCH --job-name="$1"
 #SBATCH --account=fc_cosmoml
 #SBATCH --nodes=1
 #SBATCH --cpus-per-task=2
@@ -9,4 +9,4 @@
 #SBATCH --qos=savio_normal
 
 module load tensorflow/1.12.0-py36-pip-gpu
-srun python "$1"
+srun python "$@"
