@@ -10,7 +10,7 @@ import git
 
 def add_commit_hash(name):
     repo = git.Repo(search_parent_directories=True)
-    sha = r.head.object.hexsha
+    sha = repo.head.object.hexsha
     short_sha = repo.git.rev_parse(sha, short=7)
     return name + "-" + short_sha
 
