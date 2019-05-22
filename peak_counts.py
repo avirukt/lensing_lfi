@@ -1,6 +1,8 @@
 from power_spectrum import *
 import git
 
+print("starting peak counts")
+
 p = np.load("params_conc.npy")
 x = np.load("data_scaled.npy")
 tot_nsims = len(p)
