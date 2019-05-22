@@ -3,7 +3,7 @@ print("starting noiseless")
 from power_spectrum import *
 
 nsims_test = 10**4
-batch_size = 512
+batch_size = 128
 
 feature_description = {
     'field': tf.FixedLenFeature([2**16], tf.float32),
