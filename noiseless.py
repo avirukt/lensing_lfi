@@ -11,6 +11,7 @@ feature_description = {
 }
 
 data_path = "/global/scratch/avirukt/jia_sims.tfrecord"
+buffer_size = int(1.2*batch_size*256**2*4)
 
 def parse(example_proto):
     # Parse the input tf.Example proto using the dictionary above.
@@ -18,11 +19,11 @@ def parse(example_proto):
     return (tf.reshape(d["field"],(256,256)),d["params"])
 
 def testing_input_fn(batch_size=batch_size):
-    dataset = tf.data.TFRecordDataset(data_path)
+    dataset = tf.data.TFRecordDataset(data_path, buffer_size=buffer_size)
     return dataset.take(nsims_test).map(parse).batch(batch_size)
 
 def training_input_fn(shuffle_buffer=100, batch_size=batch_size):
-    dataset = tf.data.TFRecordDataset(data_path)
+    dataset = tf.data.TFRecordDataset(data_path, buffer_size=buffer_size)
     return dataset.skip(nsims_test).map(parse).repeat().shuffle(shuffle_buffer).batch(batch_size)
 
 
