@@ -21,7 +21,7 @@ def testing_input_fn(batch_size=batch_size):
     dataset = tf.data.TFRecordDataset(data_path)
     return dataset.take(nsims_test).map(parse).batch(batch_size)
 
-def training_input_fn(shuffle_buffer=1000, batch_size=batch_size):
+def training_input_fn(shuffle_buffer=100, batch_size=batch_size):
     dataset = tf.data.TFRecordDataset(data_path)
     return dataset.skip(nsims_test).map(parse).repeat().shuffle(shuffle_buffer).batch(batch_size)
 
