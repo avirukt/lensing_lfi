@@ -1,7 +1,5 @@
 from power_spectrum import *
-import git
-
-print("starting peak counts")
+import sys
 
 p = np.load("params_conc.npy")
 x = np.load("data_scaled.npy")
@@ -20,6 +18,6 @@ p_test = array([p[ind] for ind in indices[nsims_train:]])
 
 batch_size = 128
 
-model = LFI(["field"],labels,model_dir=add_commit_hash("/global/scratch/avirukt/models/peak_counts"))
+model = LFI(["field"],labels,model_dir=sys.argv[1])
 
 model.train(training_fn_generator(x_train,p_train, batch_size=batch_size), max_steps=300*nsims_train//batch_size)
