@@ -8,7 +8,7 @@ short_sha = repo.git.rev_parse(sha, short=7)
 name = "%s-%s"%(sys.argv[1][:-3],short_sha)
 
 script = "scripts/%s.sh"%name
-out = "~/name/outputs/%s.out"%name
+out = '"/global/home/users/avirukt/name/outputs/%s.out"'%name
 
 with open("template_script.sh", "r") as file:
 	f = file.readlines()
