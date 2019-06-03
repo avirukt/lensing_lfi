@@ -12,6 +12,8 @@ feature_description = {
 data_path = "/global/scratch/avirukt/jia_sims.tfrecord"
 buffer_size = int(1.2*batch_size*256**2*4)
 
+max_element = 250000
+
 def parse(example_proto):
     # Parse the input tf.Example proto using the dictionary above.
     d = tf.parse_single_example(example_proto, feature_description)
@@ -23,7 +25,7 @@ def testing_input_fn(batch_size=batch_size):
 
 def training_input_fn(shuffle_buffer=100, batch_size=batch_size):
     dataset = tf.data.TFRecordDataset(data_path, buffer_size=buffer_size)
-    return dataset.skip(nsims_test).map(parse).repeat().shuffle(shuffle_buffer).batch(batch_size)
+    return dataset.take(max_element).skip(nsims_test).map(parse).repeat().shuffle(shuffle_buffer).batch(batch_size)
 
 
 model = LFI(["field"], [r"$M_\nu$",r"$\Omega_m$",r"$\sigma_8$"], model_dir=sys.argv[1])
