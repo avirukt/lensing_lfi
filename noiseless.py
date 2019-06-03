@@ -2,7 +2,7 @@ from power_spectrum import *
 import sys
 
 nsims_test = 10**4
-batch_size = 32
+batch_size = 256
 
 feature_description = {
     'field': tf.FixedLenFeature([2**16], tf.float32),
