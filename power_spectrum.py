@@ -536,19 +536,21 @@ class LFI(tf.estimator.Estimator):
             # Builds the neural network
             size = features.shape[-1]
             d = len(features.shape)-1
-            assert not cnn or 1<=d<=3
-            conv = tf.reshape(features,tuple([-1]+[size]*d+[1]))
-            channels = 1
-            width = size
+            #assert not cnn or 1<=d<=3
             if cnn:
+                conv = tf.reshape(features,tuple([-1]+[size]*d+[1]))
+                channels = 1
+                width = size
                 conv_layer = [tf.layers.conv1d, tf.layers.conv2d, tf.layers.conv3d][d-1]
-            while width > 1:
-                width //= 2
-                channels *= 2**d
-                if cnn:
+                while width > 1:
+                    width //= 2
+                    channels *= 2**d
                     channels = min(channels, 1024)
                     conv = conv_layer(conv, channels, 2, strides=2, activation=tf.nn.leaky_relu)
-            dense=tf.reshape(conv,(-1,channels))
+                dense=tf.reshape(conv,(-1,channels))
+            else:
+                dense=features
+                channels = size**d
             f = -int(-(channels/label_dimension)**(1/num_dense))
             for i in range(num_dense-1):
                 channels //= f
