@@ -534,7 +534,7 @@ class LFI(tf.estimator.Estimator):
             label_dimension = len(label_columns)
             training=mode == tf.estimator.ModeKeys.TRAIN
             # Builds the neural network
-            size = features.shape[-1]
+            size = int(features.shape[-1])
             d = len(features.shape)-1
             #assert not cnn or 1<=d<=3
             if cnn:
