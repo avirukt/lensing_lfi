@@ -532,6 +532,7 @@ class LFI(tf.estimator.Estimator):
                                              model_dir=model_dir,
                                              config=config)
         
+        global lr
         lr = lambda x: tf.train.exponential_decay(0.001, x, 1000, 0.7, staircase=False) if lr is None else lr
 
         def _model_fn(features, labels, mode):
