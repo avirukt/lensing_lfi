@@ -524,12 +524,15 @@ class LFI(tf.estimator.Estimator):
                 model_fn=None,
                 cnn=True,
                 num_dense=5,
-                lr=None):
+                lr=None,
+                kernel_size=2):
         
         if model_fn is not None:
             return tf.estimator.Estimator.__init__(self,model_fn=model_fn,
                                              model_dir=model_dir,
                                              config=config)
+        
+        self._lr = lambda x: tf.train.exponential_decay(0.001, x, 1000, 0.7, staircase=False) if lr is None else lr
 
         def _model_fn(features, labels, mode):
             label_dimension = len(label_columns)
@@ -543,11 +546,11 @@ class LFI(tf.estimator.Estimator):
                 channels = 1
                 width = size
                 conv_layer = [tf.layers.conv1d, tf.layers.conv2d, tf.layers.conv3d][d-1]
-                while width > 1:
-                    width //= 2
-                    channels *= 2**d
+                while width >= kernel_size:
+                    width //= kernel_size
+                    channels *= kernel_size**d
                     channels = min(channels, 1024)
-                    conv = conv_layer(conv, channels, 2, strides=2, activation=tf.nn.leaky_relu)
+                    conv = conv_layer(conv, channels, kernel_size, strides=kernel_size, activation=tf.nn.leaky_relu)
                 dense=tf.reshape(conv,(-1,channels))
             else:
                 dense=features
@@ -608,11 +611,9 @@ class LFI(tf.estimator.Estimator):
 
             # Define optimizer
             if mode == tf.estimator.ModeKeys.TRAIN:
-                if lr is None:
-                    lr = lambda x: tf.train.exponential_decay(0.001, x, 1000, 0.7, staircase=False)
                 update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
                 with tf.control_dependencies(update_ops):
-                    train_op = optimizer(learning_rate=lr(tf.train.get_global_step())).minimize(loss=total_loss,
+                    train_op = optimizer(learning_rate=self._lr(tf.train.get_global_step())).minimize(loss=total_loss,
                                                 global_step=tf.train.get_global_step())
                 tf.summary.scalar('loss', loss)
             elif mode == tf.estimator.ModeKeys.EVAL:
