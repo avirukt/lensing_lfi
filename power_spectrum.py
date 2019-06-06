@@ -523,7 +523,8 @@ class LFI(tf.estimator.Estimator):
                 n_samples = 2000,
                 model_fn=None,
                 cnn=True,
-                num_dense=5):
+                num_dense=5,
+                lr=None):
         
         if model_fn is not None:
             return tf.estimator.Estimator.__init__(self,model_fn=model_fn,
@@ -607,10 +608,11 @@ class LFI(tf.estimator.Estimator):
 
             # Define optimizer
             if mode == tf.estimator.ModeKeys.TRAIN:
+                if lr is None:
+                    lr = lambda x: tf.train.exponential_decay(0.001, x, 1000, 0.7, staircase=False)
                 update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
-                learning_rate =  tf.train.exponential_decay(0.001, tf.train.get_global_step(), 1000, 0.7, staircase=False)
                 with tf.control_dependencies(update_ops):
-                    train_op = optimizer(learning_rate=learning_rate).minimize(loss=total_loss,
+                    train_op = optimizer(learning_rate=lr(tf.train.get_global_step())).minimize(loss=total_loss,
                                                 global_step=tf.train.get_global_step())
                 tf.summary.scalar('loss', loss)
             elif mode == tf.estimator.ModeKeys.EVAL:

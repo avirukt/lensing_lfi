@@ -20,4 +20,4 @@ batch_size = 128
 
 model = LFI(["field"],labels,model_dir=sys.argv[1],cnn=False)
 
-model.train(training_fn_generator(x_train,p_train, batch_size=batch_size), max_steps=300*nsims_train//batch_size)
+model.train(training_fn_generator(x_train,p_train, batch_size=batch_size), max_steps=300*nsims_train//batch_size, lr=lambda x: 0.05)
