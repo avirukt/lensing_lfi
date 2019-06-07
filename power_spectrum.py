@@ -618,6 +618,7 @@ class LFI(tf.estimator.Estimator):
                     train_op = optimizer(learning_rate=lr).minimize(loss=total_loss,
                                                 global_step=tf.train.get_global_step())
                 tf.summary.scalar('loss', loss)
+                tf.summary.scalar('learning rate', lr)
             elif mode == tf.estimator.ModeKeys.EVAL:
                 eval_metric_ops = { "log_p": loss}
 
