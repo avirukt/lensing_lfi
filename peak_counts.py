@@ -18,6 +18,6 @@ p_test = array([p[ind] for ind in indices[nsims_train:]])
 
 batch_size = 128
 
-model = LFI(["field"], labels, model_dir=sys.argv[1], learning_rate=lambda x: tf.cond(x<5000, lambda: 0.001, lambda: 0.0001))
+model = LFI(["field"], labels, model_dir=sys.argv[1], learning_rate=lambda x: tf.cond(x<50000, lambda: 0.001, lambda: 0.0001))
 
 model.train(training_fn_generator(x_train,p_train, batch_size=batch_size), max_steps=100000)
