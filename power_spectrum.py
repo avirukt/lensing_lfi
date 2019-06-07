@@ -613,7 +613,7 @@ class LFI(tf.estimator.Estimator):
             # Define optimizer
             if mode == tf.estimator.ModeKeys.TRAIN:
                 update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
-                lr = learning_rate(tf.train.get_global_step())
+                lr = learning_rate(tf.train.get_global_step()) if callable(learning_rate) else learning_rate
                 with tf.control_dependencies(update_ops):
                     train_op = optimizer(learning_rate=lr).minimize(loss=total_loss,
                                                 global_step=tf.train.get_global_step())
