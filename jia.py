@@ -25,11 +25,9 @@ else:
         d = tf.parse_single_example(example_proto, feature_description)
         return (tf.reshape(d["field"],(256,256)),d["params"])
 
-buffer_size = int(1.2*batch_size*256**2*4)
-
 def training_input_fn(shuffle_buffer=100, batch_size=batch_size):
     files = tf.data.Dataset.list_files("/global/scratch/avirukt/jia_sims/%s/[0-8]*.tfrecord"%version) #save last 1k tfrecords for testing
-    dataset = files.interleave(lambda x: tf.data.TFRecordDataset(x),cycle_length=1, block_length=1, num_parallel_calls=1)
+    dataset = files.interleave(lambda x: tf.data.TFRecordDataset(x), cycle_length=2, block_length=1, num_parallel_calls=2)
     return dataset.map(parse).repeat().shuffle(shuffle_buffer).batch(batch_size)
 
 model = LFI(["field"], [r"$M_\nu$",r"$\Omega_m$",r"$\sigma_8$"], model_dir=sys.argv[1], **kwargs)
