@@ -1,7 +1,7 @@
 from power_spectrum import *
 import sys
 
-batch_size = 256
+batch_size = 64
 
 feature_description = {
     'field': tf.FixedLenFeature([2**16], tf.float32),
