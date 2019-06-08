@@ -2,23 +2,35 @@ from power_spectrum import *
 import sys
 
 batch_size = 64
+version = sys.argv[2]
 
 feature_description = {
     'field': tf.FixedLenFeature([2**16], tf.float32),
     "params": tf.FixedLenFeature([3], tf.float32)
 }
 
-data_path = ["/global/scratch/avirukt/jia_sims/%s/%04d.tfrecord"%(sys.argv[2],i) for i in range(9000)]
+kwargs = {}
+
+if "random_mask" in version:
+    feature_description["mask"] = tf.FixedLenFeature([2**16], tf.float32)
+    kwargs["input_depth"] = 2
+    
+    def parse(example_proto):
+        # Parse the input tf.Example proto using the dictionary above.
+        d = tf.parse_single_example(example_proto, feature_description)
+        return (tf.reshape(tf.stack([d["field"],d["mask"]],axis=-1),(256,256,2)),d["params"])
+else:
+    def parse(example_proto):
+        # Parse the input tf.Example proto using the dictionary above.
+        d = tf.parse_single_example(example_proto, feature_description)
+        return (tf.reshape(d["field"],(256,256)),d["params"])
+
 buffer_size = int(1.2*batch_size*256**2*4)
 
-def parse(example_proto):
-    # Parse the input tf.Example proto using the dictionary above.
-    d = tf.parse_single_example(example_proto, feature_description)
-    return (tf.reshape(d["field"],(256,256)),d["params"])
-
 def training_input_fn(shuffle_buffer=100, batch_size=batch_size):
-    dataset = tf.data.TFRecordDataset(data_path, buffer_size=buffer_size)
-    return dataset.map(parse).repeat().shuffle(shuffle_buffer).batch(batch_size)
+    files = tf.data.Dataset.list_files("/global/scratch/avirukt/jia_sims/%s/[0-8]*.tfrecord"%version) #save last 1k tfrecords for testing
+    dataset = files.interleave(lambda x: tf.data.TFRecordDataset(x).map(parse),cycle_length=4, block_length=4, num_parallel_calls=2)
+    return dataset.repeat().shuffle(shuffle_buffer).batch(batch_size)
 
-model = LFI(["field"], [r"$M_\nu$",r"$\Omega_m$",r"$\sigma_8$"], model_dir=sys.argv[1])
+model = LFI(["field"], [r"$M_\nu$",r"$\Omega_m$",r"$\sigma_8$"], model_dir=sys.argv[1], **kwargs)
 model.train(training_input_fn, max_steps=20000)

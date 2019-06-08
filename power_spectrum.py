@@ -525,7 +525,8 @@ class LFI(tf.estimator.Estimator):
                 cnn=True,
                 num_dense=5,
                 learning_rate=None,
-                kernel_size=2):
+                kernel_size=2,
+                input_depth=1):
         
         if model_fn is not None:
             return tf.estimator.Estimator.__init__(self,model_fn=model_fn,
@@ -543,8 +544,9 @@ class LFI(tf.estimator.Estimator):
             d = len(features.shape)-1
             #assert not cnn or 1<=d<=3
             if cnn:
-                conv = tf.reshape(features,tuple([-1]+[size]*d+[1]))
-                channels = 1
+                if input_depth == 1:
+                    conv = tf.reshape(features,tuple([-1]+[size]*d+[1]))
+                channels = input_depth
                 width = size
                 conv_layer = [tf.layers.conv1d, tf.layers.conv2d, tf.layers.conv3d][d-1]
                 while width >= kernel_size:
