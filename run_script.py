@@ -28,4 +28,4 @@ with open(script, "w") as file:
 	for line in f:
 		file.write(line)
 
-#subprocess.run(["sbatch",script])
+subprocess.run(["sbatch",script])

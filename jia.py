@@ -8,7 +8,7 @@ feature_description = {
     "params": tf.FixedLenFeature([3], tf.float32)
 }
 
-data_path = ["/global/scratch/avirukt/jia_sims/%s/%04d.tfrecord"%(sys.argv[1],i) for i in range(9000)]
+data_path = ["/global/scratch/avirukt/jia_sims/%s/%04d.tfrecord"%(sys.argv[2],i) for i in range(9000)]
 buffer_size = int(1.2*batch_size*256**2*4)
 
 def parse(example_proto):
@@ -17,7 +17,7 @@ def parse(example_proto):
     return (tf.reshape(d["field"],(256,256)),d["params"])
 
 def training_input_fn(shuffle_buffer=100, batch_size=batch_size):
-    dataset = tf.data.TFRecordDataset(data_path, buffer_size=buffer_size)
+    dataset = tf.data.TFRecordDataset(data_path, buffer_size=buffer_size, num_parallel_reads=3)
     return dataset.map(parse).repeat().shuffle(shuffle_buffer).batch(batch_size)
 
 model = LFI(["field"], [r"$M_\nu$",r"$\Omega_m$",r"$\sigma_8$"], model_dir=sys.argv[1])
