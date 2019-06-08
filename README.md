@@ -2,18 +2,38 @@
 
 ## Jia's processed sims
 
-- `jia_sims.tfrecord`: ~250 GB (101x10000 maps), 256x256 pixels, 0.8 arcmin each
-- `jia_sims_noisy.tfrecord`: ~66 GB, including noise (standard deviation of 0.082 in each pixel)
-- `jia_sims_whitened.tfrecord`: ~66 GB, standardised to flat power spectrum (using interpolation)
-- `jia_sims_gaussian.tfrecord`: ~66 GB, Gaussian sims with removed (interpolated) power spectrum
+There are 101x10k sims, which are in 10k TFRecords named `0000.tfrecord` to `9999.tfrecord`. 
 
-Beware the last few might be corrupted (trust upto the penultimate batch, batch size was 1k). Every 101 elements are the 101 cosmologies.
+There are 4x4=16 versions: 
+4 kinds of pre-processing:
 
-The files are in:
+1. No pre-processing
+2. Whitened
+3. Partially whitened
+4. Gaussian (with removed PS)
+
+4 kinds of noise:
+
+1. Noiseless
+2. Constant noise: use average of 5.12 galaxies for each pixel
+3. Constant "mask": draw a single galaxy map from Poisson and use it for all images
+4. Random "mask": draw a random galaxy map for each image
+
+Each version is a folder in:
 - NERSC: `/global/cscratch1/sd/avirukt/jia_sims/`
-- Savio: `global/scratch/avirukt/`
+- Savio: `global/scratch/avirukt/jia_sims/`
 
-Each element is dict with two keys: `field`, a list of 256x256 floats, and `params`, a list of 3 floats (M_nu, Omega_m, sigma_8). To generate testing and training input functions for `tf.Estimator`s:
+The name of the folder containing the TFRecords for each version is 
+||1|2|3|4|
+|---|---|---|---|---|
+|1|`noiseless`|`noiseless_whitened`||`noiseless_gaussian`|
+|2|`constant_noise`||||
+|3|`constant_mask`\*||||
+|4|`random_mask`||||
+
+\*The directory `constant_mask` also contains the file `mask.npy` which contains the galaxy map drawn from a Poisson that was used for the maps in that folder.
+
+Each TFRecord contains 101 elements corresponding to the 101 cosmologies. Each element is dict with two keys: `"field"`, a list of 256x256 floats, and `"params"`, a list of 3 floats (M_nu, Omega_m, sigma_8). The maps with random "masks" also contains the key `"mask"` a list of 256x256 32-bit integers (too late to change to bytes). Thus each TFRecord is 26 MB (51 MB with "mask"). To generate testing and training input functions for `tf.Estimator`s:
 
 ```
 feature_description = {
@@ -25,11 +45,7 @@ def parse(example_proto):
     d = tf.parse_single_example(example_proto, feature_description)
     return (tf.reshape(d["field"],(256,256)),d["params"])
 
-def testing_input_fn():
-    dataset = tf.data.TFRecordDataset(tfrecord_path, buffer_size=2**30)
-    return dataset.take(nsims_test).map(parse).batch(batch_size)
-
-def training_input_fn():
-    dataset = tf.data.TFRecordDataset(tfrecord_path, buffer_size=2**30)
-    return dataset.skip(nsims_test).map(parse).repeat().shuffle(shuffle_buffer).batch(batch_size)
+def input_fn():
+    dataset = tf.data.TFRecordDataset(tfrecord_paths, buffer_size=buffer_size)
+    return dataset.map(parse)
 ```

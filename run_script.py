@@ -5,7 +5,7 @@ import git
 repo = git.Repo(search_parent_directories=True)
 sha = repo.head.object.hexsha
 short_sha = repo.git.rev_parse(sha, short=7)
-name = "%s-%s"%(sys.argv[1][:-3],short_sha)
+name = "%s-%s"%(sys.argv[2] if len(sys.argv) > 2 else sys.argv[1][:-3],short_sha)
 
 script = "scripts/%s.sh"%name
 out = '"/global/home/users/avirukt/name/outputs/%s.out"'%name
@@ -21,8 +21,11 @@ ins(1,name)
 ins(2,out)
 ins(-1,sys.argv[1] + " " + model_dir)
 
+if len(sys.argv) > 2:
+    ins(-1," %s"%sys.argv[2])
+
 with open(script, "w") as file:
 	for line in f:
 		file.write(line)
 
-subprocess.run(["sbatch",script])
+#subprocess.run(["sbatch",script])
