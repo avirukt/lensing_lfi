@@ -17,7 +17,7 @@ def parse(example_proto):
     return (tf.reshape(d["field"],(256,256)),d["params"])
 
 def training_input_fn(shuffle_buffer=100, batch_size=batch_size):
-    dataset = tf.data.TFRecordDataset(data_path, buffer_size=buffer_size, num_parallel_reads=3)
+    dataset = tf.data.TFRecordDataset(data_path, buffer_size=buffer_size)
     return dataset.map(parse).repeat().shuffle(shuffle_buffer).batch(batch_size)
 
 model = LFI(["field"], [r"$M_\nu$",r"$\Omega_m$",r"$\sigma_8$"], model_dir=sys.argv[1])
