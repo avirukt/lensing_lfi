@@ -9,7 +9,7 @@ feature_description = {
     "params": tf.FixedLenFeature([3], tf.float32)
 }
 
-kwargs = {}
+kwargs = {"learning_rate": 0.01}
 
 if "random_mask" in version:
     feature_description["mask"] = tf.FixedLenFeature([2**16], tf.float32)
