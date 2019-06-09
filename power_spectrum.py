@@ -406,7 +406,7 @@ class LFI(tf.estimator.Estimator):
             testing_fn = testing_fn_generator(x,p)
         stats = array([p["stat"] for p in self.predict(testing_fn)])
         nbands = stats.shape[-1]
-        f,ax = subplots(nbands,nbands,sharex=True,sharey=False,gridspec_kw={"hspace": 0.05, "wspace": 0.05},figsize=(figsize*nbands,figsize*nbands))
+        f,ax = subplots(nbands,nbands,gridspec_kw={"hspace": 0.05, "wspace": 0.05},figsize=(figsize*nbands,figsize*nbands))
         if nbands==1:
             ax = array([[ax]])
         suptitle("Summary statistics")
@@ -414,8 +414,15 @@ class LFI(tf.estimator.Estimator):
             for j in range(nbands):
                 ax[i,j].hist2d(p[:,j],stats[:,i],nbins,cmap="Blues")
         for i in range(nbands):
-            ax[i,0].set_ylabel(f"statistic {i+1}")
-            ax[-1,i].set_xlabel(self.labels[i])
+            for j in range(nbands):
+                if j==0:
+                    ax[i,j].set_ylabel(f"statistic {i+1}")
+                else:
+                    ax[i,j].set_yticklabels([])
+                if i+1 == nbands:
+                    ax[i,j].set_xlabel(self.labels[j])
+                else:
+                    ax[i,j].set_xticklabels([])
         #return f
     
     def plot_means(self, x, p, compare=None, **kwags):
@@ -547,6 +554,8 @@ class LFI(tf.estimator.Estimator):
             if cnn:
                 if input_depth == 1:
                     conv = tf.reshape(features,tuple([-1]+[size]*d+[1]))
+                else:
+                    conv = features
                 channels = input_depth
                 width = size
                 conv_layer = [tf.layers.conv1d, tf.layers.conv2d, tf.layers.conv3d][d-1]
