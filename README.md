@@ -50,3 +50,14 @@ def input_fn():
     dataset = tf.data.TFRecordDataset(tfrecord_paths, buffer_size=buffer_size)
     return dataset.map(parse)
 ```
+
+
+## Running on Savio
+
+The file `jia.py` is the script for Jia's sims, `peak_counts.py` are for the peak count histograms. 
+
+First, make sure to commit any changes since the run will be identified with the (short) commit hash. Make sure there are folders named `outputs` and `scripts` in the repo root directory. Run the file `run_script.py` passing the name of the script as an argument. The script is expected to take one argument, which is the name of the model directory. The name of the run is the name of the script with the commit hash appended to it. This is the structure for `peak_counts.py`, e.g. you would run `python run_script.py peak_counts.py` and that would create a job `scripts/peak_sounts-4dc0c6b.sh` and submit it. The job will create a model directory `/global/scratch/avirukt/models/peak_counts-4dc0c6b` and output `outputs/peak_counts-4dc0c6b.out`. 
+
+`jia.py` works differently since it takes two arguments: the model directory, and the name of the version (to get the right data and architecture). `run_script.py` uses the version name instead of the script name for naming the job/model_dir/etc. and so you must supply the version as well e.g. `python run_script.py jia.py noiseless` will create a job with name/script/output/model_dir `noiseless-4dc0c6b`. 
+
+You will need Python 3 and GitPython in the environment from which you submit the job, and you will need to create a virtual/conda env named `tensorflow` with tfp 0.5 installed to actually run the job.
