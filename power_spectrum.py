@@ -549,7 +549,7 @@ class LFI(tf.estimator.Estimator):
             training=mode == tf.estimator.ModeKeys.TRAIN
             # Builds the neural network
             size = int(features.shape[-1])
-            d = len(features.shape)-1
+            d = len(features.shape) - 1 - (input_depth>1)
             #assert not cnn or 1<=d<=3
             if cnn:
                 if input_depth == 1:
