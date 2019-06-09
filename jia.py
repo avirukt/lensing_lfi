@@ -9,7 +9,7 @@ feature_description = {
     "params": tf.FixedLenFeature([3], tf.float32)
 }
 
-kwargs = {"learning_rate": lambda x: tf.train.exponential_decay(0.0005, x, 1000, 0.7, staircase=True)}
+kwargs = {"learning_rate": lambda x: tf.train.exponential_decay(0.0005, x, 1000, 0.7, staircase=False)}
 
 if "random_mask" in version:
     feature_description["mask"] = tf.FixedLenFeature([2**16], tf.float32)
