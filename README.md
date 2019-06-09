@@ -24,6 +24,7 @@ Each version is a folder in:
 - Savio: `global/scratch/avirukt/jia_sims/`
 
 The name of the folder containing the TFRecords for each version is 
+
 ||1|2|3|4|
 |---|---|---|---|---|
 |1|`noiseless`|`noiseless_whitened`||`noiseless_gaussian`|
