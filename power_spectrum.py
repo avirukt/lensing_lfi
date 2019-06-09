@@ -401,11 +401,12 @@ def testing_fn_generator(x,p,batch_size=128):
     return f
 
 class LFI(tf.estimator.Estimator):
-    def plot_summaries(self, x, p, nbins=100, figsize=4):
-        testing_fn = testing_fn_generator(x,p)
+    def plot_summaries(self, x=None, p=None, testing_fn=None, nbins=100, figsize=4):
+        if testing_fn is None:
+            testing_fn = testing_fn_generator(x,p)
         stats = array([p["stat"] for p in self.predict(testing_fn)])
         nbands = stats.shape[-1]
-        f,ax = subplots(nbands,nbands,sharex=True,sharey=True,gridspec_kw={"hspace": 0.05, "wspace": 0.05},figsize=(figsize*nbands,figsize*nbands))
+        f,ax = subplots(nbands,nbands,sharex=True,sharey=False,gridspec_kw={"hspace": 0.05, "wspace": 0.05},figsize=(figsize*nbands,figsize*nbands))
         if nbands==1:
             ax = array([[ax]])
         suptitle("Summary statistics")
