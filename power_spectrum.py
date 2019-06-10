@@ -559,7 +559,7 @@ class LFI(tf.estimator.Estimator):
                 channels = input_depth
                 width = size
                 conv_layer = [tf.layers.conv1d, tf.layers.conv2d, tf.layers.conv3d][d-1]
-                while width >= kernel_size:
+                while width > 1:
                     width //= kernel_size
                     channels *= kernel_size**d
                     channels = min(channels, 1024)
