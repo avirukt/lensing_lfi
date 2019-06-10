@@ -4,6 +4,7 @@ import sys
 model = LFI(["field"], 
             [r"$M_\nu$",r"$\Omega_m$",r"$A_s\times10^9$"], 
             model_dir=sys.argv[1], 
+            cnn=False,
             learning_rate=lambda x: tf.train.exponential_decay(0.001, x, 40000, 0.3, staircase=True)
            )
 

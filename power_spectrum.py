@@ -553,7 +553,7 @@ class LFI(tf.estimator.Estimator):
             #assert not cnn or 1<=d<=3
             if cnn:
                 if input_depth == 1:
-                    conv = tf.reshape(features,tuple([-1]+[size]*d+[1]))
+                    conv = tf.expand_dims(features,-1)
                 else:
                     conv = features
                 channels = input_depth
@@ -564,10 +564,10 @@ class LFI(tf.estimator.Estimator):
                     channels *= kernel_size**d
                     channels = min(channels, 1024)
                     conv = conv_layer(conv, channels, kernel_size, strides=kernel_size, activation=tf.nn.leaky_relu)
-                dense=tf.reshape(conv,(-1,channels))
             else:
-                dense=features
-                channels = size**d
+                channels = size**d*input_depth
+                conv = features
+            dense = tf.reshape(conv,(-1,channels))
             f = -int(-(channels/label_dimension)**(1/num_dense))
             for i in range(num_dense-1):
                 channels //= f
