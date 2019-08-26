@@ -534,7 +534,11 @@ class LFI(tf.estimator.Estimator):
                 num_dense=5,
                 learning_rate=None,
                 kernel_size=2,
+                strides=None,
                 input_depth=1):
+        
+        if strides is None:
+            strides = kernel_size
         
         if model_fn is not None:
             return tf.estimator.Estimator.__init__(self,model_fn=model_fn,
@@ -550,7 +554,7 @@ class LFI(tf.estimator.Estimator):
             # Builds the neural network
             size = int(features.shape[-1])
             d = len(features.shape) - 1 - (input_depth>1)
-            print(size,d,input_depth)
+            #print(size,d,input_depth)
             #assert not cnn or 1<=d<=3
             if cnn:
                 if input_depth == 1:
@@ -561,11 +565,12 @@ class LFI(tf.estimator.Estimator):
                 width = size
                 conv_layer = [tf.layers.conv1d, tf.layers.conv2d, tf.layers.conv3d][d-1]
                 while width > 1:
-                    width //= kernel_size
                     channels *= kernel_size**d
                     channels = min(channels, 1024)
-                    print(width,channels)
-                    conv = conv_layer(conv, channels, kernel_size, strides=kernel_size, activation=tf.nn.leaky_relu)
+                    #print(width,channels)
+                    conv = conv_layer(conv, channels, kernel_size, strides=strides, activation=tf.nn.leaky_relu)
+                    width = conv.shape[-2]
+                    print(width,type(width))
             else:
                 channels = size**d*input_depth
                 conv = features
@@ -573,7 +578,7 @@ class LFI(tf.estimator.Estimator):
             f = -int(-(channels/label_dimension)**(1/num_dense))
             for i in range(num_dense-1):
                 channels //= f
-                print(channels)
+                #print(channels)
                 dense = tf.contrib.layers.fully_connected(tf.layers.dropout(dense,rate=dropout,training=training),channels,activation_fn=tf.nn.leaky_relu)
             stat = tf.contrib.layers.fully_connected(tf.layers.dropout(dense,rate=dropout,training=training),label_dimension)
             
