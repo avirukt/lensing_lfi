@@ -37,6 +37,8 @@ if __name__=="__main__":
         ["field"], 
         [r"$M_\nu$",r"$\Omega_m$",r"$\sigma_8$"], 
         model_dir=sys.argv[1], 
+        kernel_size = 3,
+        strides = 2,
         learning_rate = lambda x: tf.train.exponential_decay(0.0005, x, 2000, 0.3, staircase=False)
     )
 
