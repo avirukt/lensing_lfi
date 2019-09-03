@@ -570,7 +570,7 @@ class LFI(tf.estimator.Estimator):
                     #print(width,channels)
                     conv = conv_layer(conv, channels, kernel_size, strides=strides, activation=tf.nn.leaky_relu)
                     width = conv.shape[-2]
-                    tf.print(width,type(width))
+                    #tf.print(width,type(width))
             else:
                 channels = size**d*input_depth
                 conv = features
