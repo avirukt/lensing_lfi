@@ -574,7 +574,7 @@ class LFI(tf.estimator.Estimator):
             else:
                 channels = size**d*input_depth
                 conv = features
-            channels *= width
+            channels = int(channels*width)
             dense = tf.reshape(conv,(-1,channels))
             f = -int(-(channels/label_dimension)**(1/num_dense))
             for i in range(num_dense-1):
