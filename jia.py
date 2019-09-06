@@ -21,7 +21,7 @@ def parse_fn(version):
         # Parse the input tf.Example proto using the dictionary above.
         d = tf.parse_single_example(example_proto, feature_description)
         field = tf.clip_by_value(tf.truediv(d["field"],scale),-cutoff,cutoff)
-        return (tf.reshape(field,(256,256)),d["params"])
+        return (tf.reshape(field,(256,256)[2:254,2:254]),d["params"])
     return fn
 
 if __name__=="__main__":

@@ -571,14 +571,14 @@ class LFI(tf.estimator.Estimator):
                     conv = conv_layer(conv, channels, kernel_size, strides=strides, activation=tf.nn.leaky_relu)
                     width = conv.shape[-2]
                     #tf.print(width,type(width))
+                channels = int(channels*width**d)
             else:
                 channels = size**d*input_depth
                 conv = features
-            channels = int(channels*width)
             dense = tf.reshape(conv,(-1,channels))
-            f = -int(-(channels/label_dimension)**(1/num_dense))
+            f = (channels/label_dimension)**(1/num_dense)
             for i in range(num_dense-1):
-                channels //= f
+                channels = int(channels/f)
                 #print(channels)
                 dense = tf.contrib.layers.fully_connected(tf.layers.dropout(dense,rate=dropout,training=training),channels,activation_fn=tf.nn.leaky_relu)
             stat = tf.contrib.layers.fully_connected(tf.layers.dropout(dense,rate=dropout,training=training),label_dimension)
