@@ -569,9 +569,9 @@ class LFI(tf.estimator.Estimator):
                     channels = min(channels, 1024)
                     #print(width,channels)
                     conv = conv_layer(conv, channels, kernel_size, strides=strides, activation=tf.nn.leaky_relu)
-                    width = conv.shape[-2]
+                    width = int(conv.shape[-2])
                     #tf.print(width,type(width))
-                channels = int(channels*width**d)
+                channels = channels*width**d
             else:
                 channels = size**d*input_depth
                 conv = features
