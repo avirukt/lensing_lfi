@@ -535,6 +535,7 @@ class LFI(tf.estimator.Estimator):
                 learning_rate=None,
                 kernel_size=2,
                 strides=None,
+                batch_norm=False,
                 input_depth=1):
         
         if strides is None:
@@ -565,6 +566,8 @@ class LFI(tf.estimator.Estimator):
                 width = size
                 conv_layer = [tf.layers.conv1d, tf.layers.conv2d, tf.layers.conv3d][d-1]
                 while width >= kernel_size:
+                    if batch_norm:
+                        conv = tf.layers.batch_normalization(conv)
                     channels *= kernel_size**d
                     channels = min(channels, 1024)
                     #print(width,channels)
