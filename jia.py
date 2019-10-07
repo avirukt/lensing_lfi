@@ -10,6 +10,7 @@ scales = {
     "noiseless": 0.16,
     "noiseless_gaussian": 0.147,
     "noiseless_whitened": 1.06,
+    "noiseless_descaled": 1,
 }
 
 cutoff = 5
@@ -21,7 +22,7 @@ def parse_fn(version):
         # Parse the input tf.Example proto using the dictionary above.
         d = tf.parse_single_example(example_proto, feature_description)
         field = tf.clip_by_value(d["field"]/scale,-cutoff,cutoff)
-        return (tf.reshape(field,(256,256))[2:254,2:254],d["params"])
+        return (tf.reshape(field,(256,256)),d["params"])
     return fn
 
 if __name__=="__main__":
@@ -37,8 +38,9 @@ if __name__=="__main__":
         ["field"], 
         [r"$M_\nu$",r"$\Omega_m$",r"$\sigma_8$"], 
         model_dir=sys.argv[1], 
-        kernel_size = 3,
-        strides = 2,
+        kernel_size=3,
+        batch_norm=True,
+        strides=2,
         learning_rate = lambda x: tf.train.exponential_decay(0.0005, x, 2000, 0.3, staircase=False)
     )
 
